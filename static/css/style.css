@@ -1,0 +1,99 @@
+    .back{
+        margin: 0;
+        background-color:antiquewhite;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .tabellone{
+        margin-top: auto;
+        height: 65%;
+        width: 70%;
+        background-color: tomato;
+        border-radius: 20px;
+
+        display: grid;
+        grid-template-columns: repeat(10, 4%);
+
+        justify-content: space-evenly;
+    }
+
+    .estratti{
+        margin-top: auto;
+        height: 10%;
+        width: 70%;
+        background-color: tomato;
+        border-radius: 20px;
+    }
+
+    .cerchio {
+        width: 100px;
+        height: 100px;
+        background-color: #e74c3c;
+        border-radius: 50%;
+        display: flex;
+        align-items: center; /* Centra verticalmente */
+        justify-content: center; /* Centra orizzontalmente */
+        color: white;
+        font-size: 48px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .margin-top{
+        margin-top: 2%;
+    }
+
+    .flex-column{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    .flex-row{
+        display: flex;
+        align-items: center;
+        flex-direction: row;
+        justify-content: space-evenly;
+    }
+
+    .circle {
+        width: 50px;
+        height: 50px;
+        background-color:#27ae60;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 16px;
+        font-weight: bold;
+        border: 2px solid antiquewhite;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    .alt{
+        background-color: rgb(36, 137, 36);
+    }
+
+    .small{
+        width: 30px;
+        height: 30px;
+    }
+
+    .circle.active {
+        background-color:darkorange; /* Colore attivo (estratto) */
+        color: white;
+        border-color: antiquewhite;
+    }
+
+    /* Linee per separare i blocchi */
+    .separator {
+        grid-column: span 10;
+        height: 2px;
+        background-color:antiquewhite;
+        margin: 5px 0;
+    }
