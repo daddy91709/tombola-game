@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+    <link rel="icon" sizes="16x16" href="{{ url_for('static', filename='images/favicon-16x16.png') }}">
+    <link rel="icon" sizes="32x32" href="{{ url_for('static', filename='images/favicon-32x32.png') }}">
+    <link rel="icon" sizes="32x32" href="{{ url_for('static', filename='images/favicon-48x48.png') }}">
+
     <title>Tombola</title>
 </head>
 <body class="back">
@@ -18,8 +24,9 @@
 
     <!-- Numero estratto -->
     <div class="numero margin-top flex-column" id="numero">
-        <div class="cerchio" id="num-estratto" onclick="estraiNumero()">--</div>
+        <div class="cerchio hoverable" id="num-estratto" onclick="estraiNumero()">--</div>
         <div id="num-desc">Premi per iniziare</div>
+        <button class="reset-btn margin-top hoverable" onclick="resetGame()">🔄 Riavvia Partita</button>
     </div>
 
     <!-- Tabellone -->
@@ -40,29 +47,6 @@
         {% endfor %}
     </div>
 
-    <script>
-        async function estraiNumero() {
-            const response = await fetch('/estrazione', { method: 'POST' });
-            if (response.ok) {
-                const data = await response.json();
-                document.getElementById('num-estratto').textContent = data.num_estratto;
-                document.getElementById('num-desc').textContent = data.desc;
-
-                const estrattiDiv = document.getElementById('estratti');
-                estrattiDiv.innerHTML = '';
-                data.estratti_recenti.forEach(num => {
-                    const div = document.createElement('div');
-                    div.className = 'small circle';
-                    div.textContent = num;
-                    estrattiDiv.appendChild(div);
-                });
-
-                document.getElementById(`num-${data.num_estratto}`).classList.add('active');
-            } else {
-                const error = await response.json();
-                alert(error.error);
-            }
-        }
-    </script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

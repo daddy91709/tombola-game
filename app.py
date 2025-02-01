@@ -106,7 +106,10 @@ def index():
 def estrazione():
     global nums, estratti
     if not nums:
-        return jsonify({"error": "Tutti i numeri sono stati estratti!"}), 400
+        return jsonify({
+            "message": "Tutti i numeri sono stati estratti!",
+            "game_over": True
+        })
 
     num_estratto = random.choice(nums)
     nums.remove(num_estratto)
@@ -115,8 +118,16 @@ def estrazione():
     return jsonify({
         "num_estratto": num_estratto,
         "desc": desc[num_estratto],
-        "estratti_recenti": estratti[-5:]
+        "estratti_recenti": estratti[-5:],
+        "game_over": False
     })
+
+@app.route('/reset', methods=['POST'])
+def reset():
+    global nums, estratti
+    nums = list(range(1, 91))  # Ripristina tutti i numeri
+    estratti = []  # Svuota gli estratti
+    return jsonify({"message": "E' iniziata una nuova partita"})
 
 if __name__ == '__main__':
     app.run(debug=True)
