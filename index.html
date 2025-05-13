@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="static/css/style.css">
+
+    <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+    <link rel="icon" sizes="16x16" href="static/images/favicon-16x16.png">
+    <link rel="icon" sizes="32x32" href="static/images/favicon-32x32.png">
+    <link rel="icon" sizes="32x32" href="static/images/favicon-48x48.png">
+
+    <title>Tombola</title>
+</head>
+<body class="back">
+    <h1>Tombola</h1>
+
+    <!-- Ultimi numeri estratti -->
+    <div class="estratti flex-row" id="estratti"></div>
+
+    <!-- Numero estratto -->
+    <div class="numero margin-top flex-column" id="numero">
+        <div class="cerchio hoverable" id="num-estratto">--</div>
+        <div id="num-desc">Premi per iniziare</div>
+        <button class="reset-btn margin-top hoverable">🔄 Riavvia Partita</button>
+    </div>
+
+    <!-- Tabellone -->
+    <div class="tabellone margin-top">
+        <script>
+            for (let i = 1; i <= 90; i++) {
+                const isAlt = !((i>=1 && i<=5) || (i>=11 && i<=15) || (i>=21 && i<=25) 
+                    || (i>=36 && i<=40) || (i>=46 && i<=50) || (i>=56 && i<=60) 
+                    || (i>=61 && i<=65) || (i>=71 && i<=75) || (i>=81 && i<=85));
+                
+                document.write(`<div class="${isAlt ? 'alt ' : ''}circle" id="num-${i}">${i}</div>`);
+                
+                if (i === 30 || i === 60) {
+                    document.write('<div class="separator"></div>');
+                }
+            }
+        </script>
+    </div>
+
+    <script src="static/js/script.js"></script>
+</body>
+</html>
