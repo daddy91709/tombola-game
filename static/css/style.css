@@ -35,12 +35,61 @@ h1 {
     max-width: 800px;
     background-color: var(--primary-color);
     border-radius: 20px;
-    padding: 1rem;
+    padding: 1.5rem;
     display: grid;
     grid-template-columns: repeat(10, 1fr);
     gap: 0.5rem;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     position: relative;
+}
+
+/* Stili per le regioni */
+.region-1 .circle { background-color: #2c3e50; }
+.region-2 .circle { background-color: #34495e; }
+.region-3 .circle { background-color: #2c3e50; }
+.region-4 .circle { background-color: #34495e; }
+.region-5 .circle { background-color: #2c3e50; }
+.region-6 .circle { background-color: #34495e; }
+
+.region-container {
+    display: contents;
+    position: relative;
+}
+
+.region-label {
+    position: absolute;
+    left: -35px;
+    color: var(--text-color);
+    font-size: 0.8rem;
+    font-weight: bold;
+    opacity: 0.7;
+}
+
+/* Separatori verticali e orizzontali per le regioni */
+.region-separator-v {
+    grid-column: 6;
+    grid-row: span 3;
+    width: 3px;
+    background: linear-gradient(180deg, 
+        transparent 0%, 
+        var(--background-color) 20%, 
+        var(--background-color) 80%, 
+        transparent 100%);
+    justify-self: center;
+    margin: 0.4rem 0;
+    opacity: 0.5;
+}
+
+.region-separator-h {
+    grid-column: 1 / -1;
+    height: 3px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        var(--background-color) 20%, 
+        var(--background-color) 80%, 
+        transparent 100%);
+    margin: 0.4rem 0;
+    opacity: 0.5;
 }
 
 .estratti {
@@ -181,10 +230,11 @@ h1 {
 }
 
 .circle.active {
-    background-color: var(--accent-color);
+    background-color: var(--accent-color) !important;
     color: white;
     border-color: var(--background-color);
     animation: pulse 0.5s ease-in-out;
+    z-index: 1;
 }
 
 .separator {
@@ -205,6 +255,95 @@ h1 {
     100% { transform: scale(1); }
 }
 
+.vincite-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    margin: 1rem auto;
+}
+
+.vincita-item {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.8rem 1.2rem;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+    width: 120px;
+    min-width: 120px;
+    max-width: 120px;
+    height: 70px;
+    min-height: 70px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.vincita-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.vincita-label {
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    gap: 0.5rem;
+}
+
+.vincita-counter {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+.vincita-item.claimed {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.vincita-item.claimed::after {
+    content: '✓';
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--accent-color);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.9rem;
+    border: 2px solid white;
+}
+
+.celebration-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1000;
+    animation: confetti 1.5s ease-out forwards;
+}
+
+@keyframes confetti {
+    0% { opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
 /* Media queries per dispositivi mobili */
 @media (max-width: 768px) {
     h1 {
@@ -213,7 +352,7 @@ h1 {
 
     .tabellone {
         width: 95%;
-        padding: 0.5rem;
+        padding: 1rem;
         gap: 0.2rem;
     }
 
@@ -243,6 +382,31 @@ h1 {
     .estratti {
         padding: 0.4rem;
         gap: 6px;
+    }
+
+    .vincite-container {
+        gap: 0.5rem;
+    }
+
+    .vincita-item {
+        padding: 0.6rem 0.8rem;
+        width: 100px;
+        min-width: 100px;
+        max-width: 100px;
+        height: 60px;
+        min-height: 60px;
+    }
+
+    .vincita-label {
+        font-size: 0.9rem;
+    }
+
+    .vincita-counter {
+        font-size: 0.8rem;
+    }
+
+    .region-label {
+        display: none;
     }
 }
 

@@ -93,6 +93,60 @@ const desc = {
     90: "'A paura (la paura)"
 };
 
+const prizes = {
+    ambo: { count: 0, required: 2, completed: false, claimed: false, manualClaimed: false, emoji: '👥' },
+    terno: { count: 0, required: 3, completed: false, claimed: false, manualClaimed: false, emoji: '🎯' },
+    quaterna: { count: 0, required: 4, completed: false, claimed: false, manualClaimed: false, emoji: '🎲' },
+    cinquina: { count: 0, required: 5, completed: false, claimed: false, manualClaimed: false, emoji: '🌟' },
+    tombola: { count: 0, required: 15, completed: false, claimed: false, manualClaimed: false, emoji: '🏆' }
+};
+
+// Definizione delle regioni del tabellone
+const regioni = [
+    { // Regione 1: prima metà delle prime tre righe
+        numeri: [
+            [1, 2, 3, 4, 5],
+            [11, 12, 13, 14, 15],
+            [21, 22, 23, 24, 25]
+        ]
+    },
+    { // Regione 2: seconda metà delle prime tre righe
+        numeri: [
+            [6, 7, 8, 9, 10],
+            [16, 17, 18, 19, 20],
+            [26, 27, 28, 29, 30]
+        ]
+    },
+    { // Regione 3: prima metà delle righe centrali
+        numeri: [
+            [31, 32, 33, 34, 35],
+            [41, 42, 43, 44, 45],
+            [51, 52, 53, 54, 55]
+        ]
+    },
+    { // Regione 4: seconda metà delle righe centrali
+        numeri: [
+            [36, 37, 38, 39, 40],
+            [46, 47, 48, 49, 50],
+            [56, 57, 58, 59, 60]
+        ]
+    },
+    { // Regione 5: prima metà delle ultime tre righe
+        numeri: [
+            [61, 62, 63, 64, 65],
+            [71, 72, 73, 74, 75],
+            [81, 82, 83, 84, 85]
+        ]
+    },
+    { // Regione 6: seconda metà delle ultime tre righe
+        numeri: [
+            [66, 67, 68, 69, 70],
+            [76, 77, 78, 79, 80],
+            [86, 87, 88, 89, 90]
+        ]
+    }
+];
+
 function calcolaNumeriVisibili() {
     const estrattiDiv = document.getElementById('estratti');
     const containerWidth = estrattiDiv.offsetWidth;
@@ -115,6 +169,155 @@ function updateEstrattiVisibili() {
     });
 }
 
+function contaNumeriInRegione(regione) {
+    const numeriRegione = estratti.filter(num => 
+        regione.numeri.flat().includes(num)
+    );
+    return { count: numeriRegione.length, numeri: numeriRegione };
+}
+
+function contaNumeriInRiga(row) {
+    return estratti.filter(num => Math.floor((num - 1) / 10) === row).length;
+}
+
+function contaNumeriInRegionePerRiga(regione) {
+    const risultati = [];
+    regione.numeri.forEach((riga, indiceRiga) => {
+        // Conta quanti numeri della riga sono stati estratti
+        const numeriTrovati = estratti.filter(num => 
+            riga.includes(num)
+        );
+
+        risultati.push({
+            row: indiceRiga,
+            count: numeriTrovati.length,
+            numeri: numeriTrovati
+        });
+    });
+    return risultati;
+}
+
+function updateVincite() {
+    // Array per tenere traccia di tutti i conteggi di tutte le righe
+    const conteggiRighe = [];
+    
+    for (let r = 0; r < 6; r++) {
+        const regione = regioni[r];
+        // Per ogni riga nella regione
+        regione.numeri.forEach(riga => {
+            // Conta quanti numeri della riga sono stati estratti
+            const numeriTrovati = estratti.filter(num => riga.includes(num));
+            conteggiRighe.push(numeriTrovati.length);
+        });
+
+        // La tombola viene ancora verificata per regione intera
+        const risultatiRighe = contaNumeriInRegionePerRiga(regione);
+        const totalNumeriRegione = risultatiRighe.reduce((total, r) => total + r.count, 0);
+        
+        // Aggiorna il contatore della tombola anche se non è stata ancora vinta
+        prizes.tombola.count = Math.max(prizes.tombola.count, totalNumeriRegione);
+        updatePrizeDisplay('tombola');
+        
+        if (totalNumeriRegione >= 15 && !prizes.tombola.claimed) {
+            prizes.tombola.won = true;
+            prizes.tombola.claimed = true;
+            if (!prizes.tombola.manualClaimed) {
+                celebraVincita('tombola');
+            }
+        }
+    }
+
+    // Trova il miglior conteggio tra tutte le righe
+    const migliorConteggio = Math.max(...conteggiRighe);
+    
+    // Aggiorna i contatori per ogni premio
+    prizes.ambo.count = Math.min(migliorConteggio, 2);
+    prizes.terno.count = Math.min(migliorConteggio, 3);
+    prizes.quaterna.count = Math.min(migliorConteggio, 4);
+    prizes.cinquina.count = Math.min(migliorConteggio, 5);
+
+    // Aggiorna i display di tutti i premi
+    updatePrizeDisplay('ambo');
+    updatePrizeDisplay('terno');
+    updatePrizeDisplay('quaterna');
+    updatePrizeDisplay('cinquina');
+    
+    // Verifica le vincite in base al miglior conteggio
+    if (migliorConteggio >= 2 && !prizes.ambo.claimed) {
+        prizes.ambo.won = true;
+        prizes.ambo.claimed = true;
+        if (!prizes.ambo.manualClaimed) {
+            celebraVincita('ambo');
+        }
+    }
+    if (migliorConteggio >= 3 && !prizes.terno.claimed) {
+        prizes.terno.won = true;
+        prizes.terno.claimed = true;
+        if (!prizes.terno.manualClaimed) {
+            celebraVincita('terno');
+        }
+    }
+    if (migliorConteggio >= 4 && !prizes.quaterna.claimed) {
+        prizes.quaterna.won = true;
+        prizes.quaterna.claimed = true;
+        if (!prizes.quaterna.manualClaimed) {
+            celebraVincita('quaterna');
+        }
+    }
+    if (migliorConteggio >= 5 && !prizes.cinquina.claimed) {
+        prizes.cinquina.won = true;
+        prizes.cinquina.claimed = true;
+        if (!prizes.cinquina.manualClaimed) {
+            celebraVincita('cinquina');
+        }
+    }
+}
+
+function updatePrizeDisplay(tipo) {
+    const element = document.getElementById(tipo);
+    if (!element) return;
+
+    // Aggiorna il contatore
+    const counter = element.querySelector('.vincita-counter');
+    if (counter) {
+        counter.textContent = `${prizes[tipo].count}/${prizes[tipo].required}`;
+    }
+
+    // Aggiorna lo stato visivo (claimed/won)
+    if (prizes[tipo].claimed) {
+        element.classList.add('claimed');
+    } else {
+        element.classList.remove('claimed');
+    }
+}
+
+function celebraVincita(tipo) {
+    // Crea l'overlay per la celebrazione
+    const overlay = document.createElement('div');
+    overlay.className = 'celebration-overlay';
+    document.body.appendChild(overlay);
+
+    // Rimuovi l'overlay dopo l'animazione
+    setTimeout(() => {
+        overlay.remove();
+    }, 1500);
+
+    // Mostra un messaggio di congratulazioni
+    alert(`Congratulazioni! Hai fatto ${tipo.toUpperCase()}! 🎉`);
+}
+
+function handleVincitaClick(tipo) {
+    if (!prizes[tipo]) return;
+    
+    // Se il premio non è stato ancora vinto, lo marchiamo come riscattato manualmente
+    if (!prizes[tipo].won) {
+        prizes[tipo].manualClaimed = !prizes[tipo].manualClaimed;
+    }
+    
+    prizes[tipo].claimed = !prizes[tipo].claimed;
+    updatePrizeDisplay(tipo);
+}
+
 function estraiNumero() {
     if (nums.length === 0) {
         if (confirm("Tutti i numeri sono stati estratti! Vuoi ricominciare la partita?")) {
@@ -132,15 +335,27 @@ function estraiNumero() {
 
     updateEstrattiVisibili();
     document.getElementById(`num-${numEstratto}`).classList.add('active');
+    
+    // Aggiorna le vincite dopo ogni estrazione
+    updateVincite();
 }
 
+// Modifica resetGame per gestire anche lo stato claimed
 function resetGame() {
     if (!confirm("Sei sicuro di voler ricominciare la partita?")) return;
 
     nums = Array.from({ length: 90 }, (_, i) => i + 1);
     estratti = [];
+    
+    // Reset delle vincite
+    Object.keys(prizes).forEach(tipo => {
+        prizes[tipo].count = 0;
+        prizes[tipo].won = false;
+        prizes[tipo].claimed = false;
+        prizes[tipo].manualClaimed = false;
+        updatePrizeDisplay(tipo);
+    });
 
-    alert("Partita riavviata!");
     location.reload();
 }
 
@@ -148,18 +363,50 @@ function createTabellone() {
     const tabellone = document.querySelector('.tabellone');
     tabellone.innerHTML = '';
     
-    for(let i = 1; i <= 90; i++) {
-        // Add separator before each new decade (except the first one)
-        if (i % 10 === 1 && i > 1) {
-            const separator = document.createElement('div');
-            separator.className = 'separator';
-            tabellone.appendChild(separator);
-        }
+    // Crea contenitori per le regioni e separatori
+    for (let regionIdx = 0; regionIdx < 6; regionIdx++) {
+        const regionContainer = document.createElement('div');
+        regionContainer.className = `region-container region-${regionIdx + 1}`;
         
-        const circle = document.createElement('div');
-        circle.className = 'circle hoverable' + (i % 2 === 0 ? ' alt' : '');
-        circle.textContent = i;
-        tabellone.appendChild(circle);
+        // Aggiungi label della regione
+        const label = document.createElement('span');
+        label.className = 'region-label';
+        label.textContent = `R${regionIdx + 1}`;
+        regionContainer.appendChild(label);
+
+        // Calcola l'intervallo di numeri per questa regione
+        const startRow = Math.floor(regionIdx / 2) * 3;
+        const isRightSide = regionIdx % 2 === 1;
+        const baseStart = startRow * 10 + 1;
+        
+        // Aggiungi i numeri per questa regione
+        for (let row = 0; row < 3; row++) {
+            const rowStart = baseStart + (row * 10);
+            for (let i = 0; i < 5; i++) {
+                const num = isRightSide ? rowStart + i + 5 : rowStart + i;
+                const circle = document.createElement('div');
+                circle.className = 'circle hoverable';
+                circle.id = `num-${num}`;
+                circle.textContent = num;
+                regionContainer.appendChild(circle);
+            }
+        }
+
+        tabellone.appendChild(regionContainer);
+
+        // Aggiungi separatore verticale dopo le regioni dispari (tranne l'ultima)
+        if (regionIdx % 2 === 0 && regionIdx < 5) {
+            const sepV = document.createElement('div');
+            sepV.className = 'region-separator-v';
+            tabellone.appendChild(sepV);
+        }
+
+        // Aggiungi separatore orizzontale dopo ogni coppia di regioni (tranne l'ultima)
+        if (regionIdx === 1 || regionIdx === 3) {
+            const sepH = document.createElement('div');
+            sepH.className = 'region-separator-h';
+            tabellone.appendChild(sepH);
+        }
     }
 }
 
@@ -170,6 +417,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     numEstrattoElement.addEventListener('click', estraiNumero);
     resetButton.addEventListener('click', resetGame);
+    
+    // Aggiungi event listener per i premi cliccabili
+    Object.keys(prizes).forEach(tipo => {
+        const element = document.getElementById(tipo);
+        if (element) {
+            element.addEventListener('click', () => handleVincitaClick(tipo));
+        }
+    });
     
     // Aggiorna i numeri visibili quando la finestra viene ridimensionata
     window.addEventListener('resize', updateEstrattiVisibili);
